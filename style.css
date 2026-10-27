@@ -1,0 +1,612 @@
+:root {
+  color-scheme: light;
+  --page: #f9f9f7;
+  --surface: #fcfcfb;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --muted: #898781;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --border: rgba(11, 11, 11, .10);
+  --accent: #2a78d6;
+  --probe: #eb6834;
+  --link: #4a4945;
+  --joint: #a3a29c;
+  --warn: #d03b3b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d;
+    --surface: #1a1a19;
+    --ink: #f0efec;
+    --ink-2: #c3c2b7;
+    --muted: #898781;
+    --grid: #2c2c2a;
+    --axis: #383835;
+    --border: rgba(255, 255, 255, .10);
+    --accent: #3987e5;
+    --probe: #d95926;
+    --link: #c3c2b7;
+    --joint: #6f6e69;
+    --warn: #e66767;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+header,
+main,
+footer {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+header {
+  padding-top: 28px;
+  padding-bottom: 16px;
+}
+
+h1 {
+  font-size: 26px;
+  line-height: 1.2;
+  margin: 0 0 6px;
+  letter-spacing: -.01em;
+}
+
+header p {
+  margin: 0;
+  color: var(--ink-2);
+  max-width: 860px;
+}
+
+main {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-areas: "view panel" "map eq";
+  padding-bottom: 24px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+h2 {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted);
+  margin: 18px 0 8px;
+}
+
+.small {
+  font-size: 13px;
+  color: var(--ink-2);
+  margin: 6px 0;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+.viewcol {
+  grid-area: view;
+  min-width: 0;
+}
+
+/* межі «прилипання» сцени — лише свій рядок сітки */
+#view {
+  position: sticky;
+  top: 16px;
+  align-self: start;
+  height: clamp(420px, calc(100vh - 32px), 760px);
+  overflow: hidden;
+}
+
+#view>canvas {
+  display: block;
+  touch-action: none;
+}
+
+#probeLabel {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1px 6px;
+}
+
+#legend3d i {
+  display: inline-block;
+  width: 14px;
+  height: 10px;
+  margin-right: 1px;
+  vertical-align: -1px;
+}
+
+.chips button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.chips {
+  position: absolute;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ink-2);
+  pointer-events: none;
+}
+
+.chips>* {
+  pointer-events: auto;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+.chips label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chips input {
+  accent-color: var(--accent);
+  margin: 0;
+}
+
+#layers {
+  top: 12px;
+  left: 12px;
+  right: 12px;
+}
+
+#hint {
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+}
+
+.sw {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--probe);
+  vertical-align: -1px;
+  margin-right: 4px;
+}
+
+.panel {
+  grid-area: panel;
+  padding: 2px 16px 16px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 68px 22px;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+}
+
+.row>label {
+  font-style: italic;
+  font-family: "Cambria Math", "Times New Roman", serif;
+  font-size: 16px;
+}
+
+.row>span {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.row input[type=number] {
+  width: 100%;
+  font: inherit;
+  font-size: 14px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  background: var(--page);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px 4px;
+}
+
+.check {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 13px;
+  color: var(--ink-2);
+  margin: 10px 0 0;
+  cursor: pointer;
+}
+
+.check input {
+  accent-color: var(--accent);
+  margin: 3px 0 0;
+}
+
+input[type=range] {
+  width: 100%;
+  accent-color: var(--accent);
+  margin: 0;
+}
+
+.msg {
+  color: var(--warn);
+  font-size: 13px;
+  margin: 6px 0 0;
+  min-height: 1px;
+}
+
+.seg {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.seg button {
+  font: inherit;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  padding: 7px 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.seg button+button {
+  border-left: 1px solid var(--border);
+}
+
+.seg button small {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.seg button[aria-pressed="true"] {
+  background: var(--accent);
+  color: #fff;
+}
+
+.seg button[aria-pressed="true"] small {
+  color: rgba(255, 255, 255, .85);
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.hero {
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero small {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+.hero .sw {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  margin-right: 8px;
+  vertical-align: 2px;
+}
+
+#bars {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr) 44px;
+  gap: 6px 8px;
+  align-items: center;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+#bars>span:nth-child(3n) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.track i {
+  display: block;
+  height: 8px;
+  min-width: 1px;
+  background: var(--accent);
+  border-radius: 0 4px 4px 0;
+}
+
+.params {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 112px;
+  gap: 6px 8px;
+  align-items: center;
+  font-size: 14px;
+}
+
+.params input,
+.params select {
+  width: 100%;
+  font: inherit;
+  color: var(--ink);
+  background: var(--page);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 6px;
+}
+
+.trajctl {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 52px;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.trajctl output {
+  text-align: right;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.btn {
+  font: inherit;
+  font-size: 14px;
+  color: #fff;
+  background: var(--accent);
+  border: 0;
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  min-width: 8.2em;
+  text-align: left;
+}
+
+.tchart {
+  margin-top: 10px;
+}
+
+.th {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.th b {
+  color: var(--ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.tchart canvas {
+  display: block;
+  width: 100%;
+  height: 64px;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+details {
+  margin-top: 14px;
+}
+
+summary {
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+details .params {
+  margin-top: 10px;
+}
+
+.mapcard {
+  grid-area: map;
+  padding: 2px 16px 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 400px) minmax(220px, 1fr);
+  gap: 0 24px;
+  align-items: start;
+}
+
+.mapcard>h2,
+.mapcard>.small {
+  grid-column: 1 / -1;
+}
+
+#mapwrap {
+  position: relative;
+  min-width: 0;
+}
+
+#map {
+  display: block;
+  cursor: crosshair;
+  touch-action: manipulation;
+}
+
+#tip {
+  position: absolute;
+  pointer-events: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .12);
+  white-space: nowrap;
+}
+
+#legend {
+  display: flex;
+  gap: 2px;
+  margin-top: 10px;
+}
+
+#legend>div {
+  flex: 1;
+  min-width: 0;
+}
+
+#legend i {
+  display: block;
+  height: 10px;
+  border-radius: 2px;
+}
+
+#legend span {
+  font-size: 11px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+#legend .end {
+  flex: 0 0 auto;
+  padding-top: 10px;
+}
+
+.mapcard ul {
+  padding-left: 18px;
+  margin: 8px 0;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.mapcard li {
+  margin-bottom: 6px;
+}
+
+.eqs {
+  grid-area: eq;
+  padding: 2px 16px 16px;
+}
+
+.eq {
+  margin: 0 0 14px;
+}
+
+.eq figcaption {
+  font-size: 13px;
+  color: var(--ink-2);
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.sys {
+  border-left: 2px solid var(--axis);
+  padding-left: 10px;
+  font-family: "Cambria Math", "STIX Two Math", "Times New Roman", serif;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.sys div {
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+}
+
+.sys i {
+  font-style: italic;
+}
+
+table {
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  width: 100%;
+}
+
+th,
+td {
+  padding: 3px 6px;
+  text-align: right;
+  border-bottom: 1px solid var(--grid);
+}
+
+th {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+details.notes {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+details.notes ol {
+  padding-left: 18px;
+}
+
+footer {
+  color: var(--muted);
+  font-size: 13px;
+  padding-bottom: 32px;
+}
+
+@media (max-width: 960px) {
+  main {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "view" "panel" "map" "eq";
+  }
+
+  #view {
+    position: relative;
+    top: auto;
+    height: 55vh;
+    min-height: 340px;
+  }
+
+  #hint>span:last-child {
+    display: none;
+  }
+
+  /* на телефоні підказка закриває сцену */
+  .mapcard {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
